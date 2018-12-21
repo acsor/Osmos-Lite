@@ -10,6 +10,12 @@ bool Particle::nearby (Particle const &o, float whence) {
 	return sqrt(pow(x - o.x, 2) + pow(y - o.y, 2)) <= whence;
 }
 
+Particle Particle::merge (Particle const &o) const {
+	return {
+		(x + o.x) / 2, (y + o.y) / 2, radius + o.radius
+	};
+}
+
 bool Particle::operator== (Particle const &o) const {
 	return x == o.x && y == o.y && radius == o.radius;
 }

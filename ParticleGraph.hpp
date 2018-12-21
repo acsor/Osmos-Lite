@@ -14,7 +14,7 @@ struct Particle {
 
 	bool clashes (Particle const &o) const;
 	bool nearby (Particle const &o, float whence);
-	Particle merge (Particle const &o);
+	Particle merge (Particle const &o) const;
 	bool operator== (Particle const &o) const;
 	bool operator< (Particle const &o) const;
 };

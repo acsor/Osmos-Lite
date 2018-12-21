@@ -20,3 +20,9 @@ TEST_CASE("Particle::nearby()", "[Particle]") {
 	REQUIRE(p.nearby(q, 2) == 0);
 	REQUIRE(p.nearby(q, 1) == 0);
 }
+
+TEST_CASE("Particle::merge()", "[Particle]") {
+	Particle p{0, 1, 1}, q{1, 0, 1};
+
+	REQUIRE(p.merge(q) == Particle{0.5, 0.5, 2});
+}
