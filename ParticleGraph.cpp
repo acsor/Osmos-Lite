@@ -51,6 +51,19 @@ bool ParticleEdge::operator== (ParticleEdge const &e) const {
 }
 
 
+inline pair<Particle*, Particle*> ParticleGraph::findClash() const {
+	for (auto a = particles.begin(); a != particles.end(); a++) {
+		for (auto b = next(a); b != particles.end(); b++) {
+			if (a->clashes(*b))
+				return pair<Particle*, Particle*>(
+					(Particle*)&(*a), (Particle*)&(*b)
+				);
+		}
+	}
+
+	return pair<Particle*, Particle*>(nullptr, nullptr);
+}
+
 ParticleGraph::ParticleGraph() {
 }
 
@@ -61,6 +74,17 @@ ParticleGraph::ParticleGraph(initializer_list<Particle> in) {
 }
 
 void ParticleGraph::update() {
+	pair<Particle*, Particle*> p = findClash();
+
+	while (p.first != nullptr && p.second != nullptr) {
+		particles.insert(p.first->merge(*(p.second)));
+		particles.erase(*(p.first));
+		particles.erase(*(p.second));
+
+		p = findClash();
+	}
+}
+
 void ParticleGraph::move(Particle *to_move, float xcoord, float ycoord) {
 	to_move->x = xcoord;
 	to_move->y = ycoord;
@@ -78,7 +102,7 @@ bool ParticleGraph::operator== (ParticleGraph const &g) const {
 }
 
 string ParticleGraph::toString () {
-	// TO-DO Implement with proper character allocation.
+	// TO-DO Implement with proper (and not heuristic) character allocation.
 	char buff[30], s[20 * particles.size()] = "";
 	size_t size = sizeof(s) / sizeof(char);
 

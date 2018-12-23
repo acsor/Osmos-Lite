@@ -26,3 +26,17 @@ TEST_CASE("Particle::merge()", "[Particle]") {
 
 	REQUIRE(p.merge(q) == Particle{0.5, 0.5, 2});
 }
+
+
+TEST_CASE("ParticleGraph::update()", "[ParticleGraph]") {
+	ParticleGraph g{
+		Particle{1, 0, 1}, Particle{3, 0, 2}, Particle{6, 6, 1}
+	};
+	ParticleGraph expected{
+		Particle{2, 0, 3}, Particle{6, 6, 1}
+	};
+
+	g.update();
+	INFO(g.toString());
+	REQUIRE(g == expected);
+}
