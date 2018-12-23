@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <cstring>
 #include "ParticleGraph.hpp"
 
 
@@ -6,7 +7,7 @@ bool Particle::clashes (Particle const &o) const {
 	return sqrt(pow(x - o.x, 2) + pow(y - o.y, 2)) <= radius + o.radius;
 }
 
-bool Particle::nearby (Particle const &o, float whence) {
+bool Particle::nearby (Particle const &o, float whence) const {
 	return sqrt(pow(x - o.x, 2) + pow(y - o.y, 2)) <= whence;
 }
 
@@ -22,6 +23,14 @@ bool Particle::operator== (Particle const &o) const {
 
 bool Particle::operator< (Particle const &o) const {
 	return x < o.x ? true: y < o.y;
+}
+
+string Particle::toString () {
+	char o[40];
+
+	snprintf(o, 40, "{%.2f, %.2f, %.2f}", x, y, radius);
+
+	return o;
 }
 
 
@@ -52,12 +61,37 @@ ParticleGraph::ParticleGraph(initializer_list<Particle> in) {
 }
 
 void ParticleGraph::update() {
+void ParticleGraph::move(Particle *to_move, float xcoord, float ycoord) {
+	to_move->x = xcoord;
+	to_move->y = ycoord;
+	update();
 }
 
-void ParticleGraph::move(Particle *to_move, float xcoord, float ycord) {
-
+void ParticleGraph::advance(Particle *to_move, float xcoord, float ycoord) {
+	to_move->x += xcoord;
+	to_move->y += ycoord;
+	update();
 }
 
-void ParticleGraph::advance(Particle *to_move, float xcoord, float ycord) {
+bool ParticleGraph::operator== (ParticleGraph const &g) const {
+	return particles == g.particles;
+}
 
+string ParticleGraph::toString () {
+	// TO-DO Implement with proper character allocation.
+	char buff[30], s[20 * particles.size()] = "";
+	size_t size = sizeof(s) / sizeof(char);
+
+	for (auto i = particles.begin(); i != particles.end(); i++) {
+		snprintf(buff, 30, "{%.2f, %.2f, %.2f}", i->x, i->y, i->radius);
+		strncat(s, buff, size);
+		size -= strlen(buff);
+
+		if (next(i) != particles.end()) {
+			strncat(s, ", ", size);
+			size -= 2;
+		}
+	}
+
+	return s;
 }
