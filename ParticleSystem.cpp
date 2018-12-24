@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <cstring>
-#include "ParticleGraph.hpp"
+#include "ParticleSystem.hpp"
 
 
 bool Particle::clashes (Particle const &o) const {
@@ -51,7 +51,7 @@ bool ParticleEdge::operator== (ParticleEdge const &e) const {
 }
 
 
-inline pair<Particle*, Particle*> ParticleGraph::findClash() const {
+inline pair<Particle*, Particle*> ParticleSystem::findClash() const {
 	for (auto a = particles.begin(); a != particles.end(); a++) {
 		for (auto b = next(a); b != particles.end(); b++) {
 			if (a->clashes(*b))
@@ -64,16 +64,16 @@ inline pair<Particle*, Particle*> ParticleGraph::findClash() const {
 	return pair<Particle*, Particle*>(nullptr, nullptr);
 }
 
-ParticleGraph::ParticleGraph() {
+ParticleSystem::ParticleSystem() {
 }
 
-ParticleGraph::ParticleGraph(initializer_list<Particle> in) {
+ParticleSystem::ParticleSystem(initializer_list<Particle> in) {
 	for (auto i = in.begin(); i != in.end(); i++) {
 		particles.insert(*i);
 	}
 }
 
-void ParticleGraph::update() {
+void ParticleSystem::update() {
 	pair<Particle*, Particle*> p = findClash();
 
 	while (p.first != nullptr && p.second != nullptr) {
@@ -85,23 +85,23 @@ void ParticleGraph::update() {
 	}
 }
 
-void ParticleGraph::move(Particle *to_move, float xcoord, float ycoord) {
+void ParticleSystem::move(Particle *to_move, float xcoord, float ycoord) {
 	to_move->x = xcoord;
 	to_move->y = ycoord;
 	update();
 }
 
-void ParticleGraph::advance(Particle *to_move, float xcoord, float ycoord) {
+void ParticleSystem::advance(Particle *to_move, float xcoord, float ycoord) {
 	to_move->x += xcoord;
 	to_move->y += ycoord;
 	update();
 }
 
-bool ParticleGraph::operator== (ParticleGraph const &g) const {
+bool ParticleSystem::operator== (ParticleSystem const &g) const {
 	return particles == g.particles;
 }
 
-string ParticleGraph::toString () {
+string ParticleSystem::toString () {
 	// TO-DO Implement with proper (and not heuristic) character allocation.
 	char buff[30], s[20 * particles.size()] = "";
 	size_t size = sizeof(s) / sizeof(char);

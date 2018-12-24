@@ -4,6 +4,7 @@
 #include <set>
 #include <cmath>
 #include <utility>
+#include "Observer.hpp"
 
 using namespace std;
 
@@ -34,21 +35,19 @@ struct ParticleEdge {
 };
 
 
-class ParticleGraph {
+class ParticleSystem: public Observable {
 	private:
 		set<Particle> particles {};
 
 		pair<Particle*, Particle*> findClash() const;
 	public:
-		static float const constexpr NEARBY_RADIUS = 5;
-
-		ParticleGraph();
-		ParticleGraph(initializer_list<Particle> in);
+		ParticleSystem();
+		ParticleSystem(initializer_list<Particle> in);
 		void move(Particle *to_move, float xcoord, float ycord);
 		void advance(Particle *to_move, float xcoord, float ycoord);
 		void update();
 
-		bool operator== (ParticleGraph const &o) const;
+		bool operator== (ParticleSystem const &o) const;
 
 		string toString ();
 };
