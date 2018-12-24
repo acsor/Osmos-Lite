@@ -25,35 +25,33 @@
 #include <set>
 
 
-namespace gravit {
-	class Observer;
+class Observer;
 
-	/**
-	 * @brief A Subject base class as defined in the `Observer' pattern of the
-	 * GOF book `Design Patterns'.
-	 *
-	 * TO-DO Document more, according to Doxygen.
-	 */
-	class Observable {
-		private:
-			std::set<Observer*> watchers {};
-		public:
-			virtual ~Observable();
+/**
+ * @brief A Subject base class as defined in the `Observer' pattern of the
+ * GOF book `Design Patterns'.
+ *
+ * TO-DO Document more, according to Doxygen.
+ */
+class Observable {
+	private:
+		std::set<Observer*> watchers {};
+	public:
+		virtual ~Observable();
 
-			void virtual notify() const final;
-			void virtual attach(Observer *o) final;
-			void virtual detach(Observer *o) final;
-	};
+		void virtual notify() const final;
+		void virtual attach(Observer *o) final;
+		void virtual detach(Observer *o) final;
+};
 
-	/**
-	 * TO-DO Document.
-	 */
-	class Observer {
-		public:
-			virtual ~Observer();
-			void virtual onChange(Observable const *o) = 0;
-	};
-}
+/**
+ * TO-DO Document.
+ */
+class Observer {
+	public:
+		virtual ~Observer();
+		void virtual onChange(Observable const *o) = 0;
+};
 
 
 #endif

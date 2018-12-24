@@ -21,8 +21,6 @@
 // SOFTWARE.
 #include "Observer.hpp"
 
-using namespace gravit;
-
 
 Observable::~Observable() {
 }
