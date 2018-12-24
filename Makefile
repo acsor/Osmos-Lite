@@ -12,6 +12,9 @@ ParticleGrid.o: ParticleGrid.cpp ParticleGrid.hpp
 ParticleGraph.o: ParticleGraph.cpp ParticleGraph.hpp
 	$(cc) $(flags) -c $(filter %.cpp, $^)
 
+Observer.o: Observer.hpp Observer.cpp
+	$(cc) $(flags) -c  $(filter %.cpp, $^)
+
 test.out: test-main.o test-particle-graph.o ParticleGraph.o
 	$(cc) $(flags) -o test.out $(filter %.cpp %.o, $^)
 
