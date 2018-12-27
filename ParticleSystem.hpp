@@ -43,6 +43,7 @@ class ParticleSystem: public Observable {
 	public:
 		ParticleSystem();
 		ParticleSystem(initializer_list<Particle> in);
+		bool add(Particle const &p);
 		void move(Particle *to_move, float xcoord, float ycord);
 		void advance(Particle *to_move, float xcoord, float ycoord);
 		void update();
@@ -50,6 +51,22 @@ class ParticleSystem: public Observable {
 		bool operator== (ParticleSystem const &o) const;
 
 		string toString ();
+};
+
+
+class ParsysGen {
+	public:
+		virtual ~ParsysGen();
+		virtual ParticleSystem generate () = 0;
+};
+
+class UnirandParsysGen: public ParsysGen {
+	private:
+		size_t n;
+		float min, max, radius_mean, radius_stddev;
+	public:
+		UnirandParsysGen (size_t n, float min, float max, float radius_mean);
+		ParticleSystem generate () override;
 };
 
 

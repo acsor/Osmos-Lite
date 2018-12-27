@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include <cstring>
+#include <random>
+#include <ctime>
 #include "ParticleSystem.hpp"
 
 
@@ -73,6 +75,16 @@ ParticleSystem::ParticleSystem(initializer_list<Particle> in) {
 	}
 }
 
+bool ParticleSystem::add(Particle const &p) {
+	// TO-DO Decide whether to add exception throwing in place of return-value
+	// signaling.
+	if (particles.find(p) != particles.end())
+		return true;
+
+	particles.insert(p);
+	return false;
+}
+
 void ParticleSystem::update() {
 	pair<Particle*, Particle*> p = findClash();
 
@@ -118,4 +130,37 @@ string ParticleSystem::toString () {
 	}
 
 	return s;
+}
+
+
+ParsysGen::~ParsysGen () {
+}
+
+UnirandParsysGen::UnirandParsysGen(
+	size_t n, float min, float max, float radius_mean
+) {
+	this->n = n;
+	this->min = min;
+	this->max = max;
+	this->radius_mean = radius_mean;
+	this->radius_stddev = sqrt(radius_mean);
+}
+
+ParticleSystem UnirandParsysGen::generate () {
+	uniform_real_distribution<float> xd{min, max}, yd{min, max};
+	normal_distribution<float> radiusd{radius_mean, radius_stddev};
+	default_random_engine e;
+	ParticleSystem o;
+	Particle p;
+
+	e.seed(time(0));
+
+	for (int i = 0; (size_t)i < n; i++) {
+		p = Particle{xd(e), yd(e), radiusd(e)};
+
+		if (o.add(p))	// If `p' was already into `o':
+			i--;
+	}
+
+	return o;
 }
