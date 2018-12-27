@@ -15,13 +15,13 @@ ParticleSystem.o: ParticleSystem.cpp ParticleSystem.hpp
 Observer.o: Observer.hpp Observer.cpp
 	$(cc) $(flags) -c  $(filter %.cpp, $^)
 
-test.out: test-main.o test-particle-graph.o ParticleSystem.o Observer.o
+test.out: test-main.o test-particle-system.o ParticleSystem.o Observer.o
 	$(cc) $(flags) -o test.out $(filter %.cpp %.o, $^)
 
 test-main.o: test/test-main.cpp
 	$(cc) $(flags) -c $(filter %.cpp, $^)
 
-test-particle-graph.o: test/test-particle-graph.cpp
+test-particle-system.o: test/test-particle-system.cpp
 	$(cc) $(flags) -c $(filter %.cpp, $^)
 
 

@@ -1,5 +1,5 @@
 #include "../catch.hpp"
-#include "../ParticleGraph.hpp"
+#include "../ParticleSystem.hpp"
 
 
 TEST_CASE("Particle::clashes()", "[Particle]") {
@@ -28,11 +28,11 @@ TEST_CASE("Particle::merge()", "[Particle]") {
 }
 
 
-TEST_CASE("ParticleGraph::update()", "[ParticleGraph]") {
-	ParticleGraph g{
+TEST_CASE("ParticleSystem::update()", "[ParticleSystem]") {
+	ParticleSystem g{
 		Particle{1, 0, 1}, Particle{3, 0, 2}, Particle{6, 6, 1}
 	};
-	ParticleGraph expected{
+	ParticleSystem expected{
 		Particle{2, 0, 3}, Particle{6, 6, 1}
 	};
 
