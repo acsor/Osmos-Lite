@@ -9,13 +9,16 @@ libs=-lsfml-graphics -lsfml-window -lsfml-system
 ParticleGrid.o: ParticleGrid.cpp ParticleGrid.hpp
 	$(cc) $(flags) $(libs) -c $(filter %.cpp, $^)
 
-ParticleSystem.o: ParticleSystem.cpp ParticleSystem.hpp
+Parsys.o: Parsys.cpp Parsys.hpp
+	$(cc) $(flags) -c $(filter %.cpp, $^)
+
+ParsysView.o: ParsysView.cpp ParsysView.hpp
 	$(cc) $(flags) -c $(filter %.cpp, $^)
 
 Observer.o: Observer.hpp Observer.cpp
 	$(cc) $(flags) -c  $(filter %.cpp, $^)
 
-test.out: test-main.o test-particle-system.o ParticleSystem.o Observer.o
+test.out: test-main.o test-particle-system.o Parsys.o Observer.o
 	$(cc) $(flags) -o test.out $(filter %.cpp %.o, $^)
 
 test-main.o: test/test-main.cpp

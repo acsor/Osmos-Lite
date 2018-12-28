@@ -9,9 +9,13 @@
 using namespace std;
 
 
+class Parsys;
+
+
 struct Particle {
 	float x, y;
 	float radius;
+	Parsys *s {nullptr};
 
 	bool clashes (Particle const &o) const;
 	bool nearby (Particle const &o, float whence) const;
@@ -35,21 +39,21 @@ struct ParticleEdge {
 };
 
 
-class ParticleSystem: public Observable {
+class Parsys: public Observable {
 	private:
 		set<Particle> particles {};
 
 		pair<Particle*, Particle*> findClash() const;
 	public:
-		ParticleSystem();
-		ParticleSystem(initializer_list<Particle> in);
+		Parsys();
+		Parsys(initializer_list<Particle> in);
 		bool add(Particle const &p);
 		bool contains(Particle const &p);
 		void move(Particle *to_move, float xcoord, float ycord);
 		void advance(Particle *to_move, float xcoord, float ycoord);
 		void update();
 
-		bool operator== (ParticleSystem const &o) const;
+		bool operator== (Parsys const &o) const;
 
 		string toString ();
 };
@@ -58,7 +62,7 @@ class ParticleSystem: public Observable {
 class ParsysGen {
 	public:
 		virtual ~ParsysGen();
-		virtual ParticleSystem generate () = 0;
+		virtual Parsys generate () = 0;
 };
 
 class UnirandParsysGen: public ParsysGen {
@@ -67,7 +71,7 @@ class UnirandParsysGen: public ParsysGen {
 		float min, max, radius_mean, radius_stddev;
 	public:
 		UnirandParsysGen (size_t n, float min, float max, float radius_mean);
-		ParticleSystem generate () override;
+		Parsys generate () override;
 };
 
 

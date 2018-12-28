@@ -2,7 +2,7 @@
 #include <cstring>
 #include <random>
 #include <ctime>
-#include "ParticleSystem.hpp"
+#include "Parsys.hpp"
 
 
 bool Particle::clashes (Particle const &o) const {
@@ -53,7 +53,7 @@ bool ParticleEdge::operator== (ParticleEdge const &e) const {
 }
 
 
-inline pair<Particle*, Particle*> ParticleSystem::findClash() const {
+inline pair<Particle*, Particle*> Parsys::findClash() const {
 	for (auto a = particles.begin(); a != particles.end(); a++) {
 		for (auto b = next(a); b != particles.end(); b++) {
 			if (a->clashes(*b))
@@ -66,16 +66,16 @@ inline pair<Particle*, Particle*> ParticleSystem::findClash() const {
 	return pair<Particle*, Particle*>(nullptr, nullptr);
 }
 
-ParticleSystem::ParticleSystem() {
+Parsys::Parsys() {
 }
 
-ParticleSystem::ParticleSystem(initializer_list<Particle> in) {
+Parsys::Parsys(initializer_list<Particle> in) {
 	for (auto i = in.begin(); i != in.end(); i++) {
 		particles.insert(*i);
 	}
 }
 
-bool ParticleSystem::add(Particle const &p) {
+bool Parsys::add(Particle const &p) {
 	// TO-DO Decide whether to add exception throwing in place of return-value
 	// signaling.
 	if (particles.find(p) != particles.end())
@@ -85,7 +85,7 @@ bool ParticleSystem::add(Particle const &p) {
 	return false;
 }
 
-bool ParticleSystem::contains(Particle const &p) {
+bool Parsys::contains(Particle const &p) {
 	for (auto i = particles.begin(); i != particles.end(); i++) {
 		if (p == *i)
 			return true;
@@ -94,7 +94,7 @@ bool ParticleSystem::contains(Particle const &p) {
 	return false;
 }
 
-void ParticleSystem::update() {
+void Parsys::update() {
 	pair<Particle*, Particle*> p = findClash();
 
 	while (p.first != nullptr && p.second != nullptr) {
@@ -106,23 +106,23 @@ void ParticleSystem::update() {
 	}
 }
 
-void ParticleSystem::move(Particle *to_move, float xcoord, float ycoord) {
+void Parsys::move(Particle *to_move, float xcoord, float ycoord) {
 	to_move->x = xcoord;
 	to_move->y = ycoord;
 	update();
 }
 
-void ParticleSystem::advance(Particle *to_move, float xcoord, float ycoord) {
+void Parsys::advance(Particle *to_move, float xcoord, float ycoord) {
 	to_move->x += xcoord;
 	to_move->y += ycoord;
 	update();
 }
 
-bool ParticleSystem::operator== (ParticleSystem const &g) const {
+bool Parsys::operator== (Parsys const &g) const {
 	return particles == g.particles;
 }
 
-string ParticleSystem::toString () {
+string Parsys::toString () {
 	// TO-DO Implement with proper (and not heuristic) character allocation.
 	char buff[30], s[20 * particles.size()] = "";
 	size_t size = sizeof(s) / sizeof(char);
@@ -155,11 +155,11 @@ UnirandParsysGen::UnirandParsysGen(
 	this->radius_stddev = sqrt(radius_mean);
 }
 
-ParticleSystem UnirandParsysGen::generate () {
+Parsys UnirandParsysGen::generate () {
 	uniform_real_distribution<float> xd{min, max}, yd{min, max};
 	normal_distribution<float> radiusd{radius_mean, radius_stddev};
 	default_random_engine e;
-	ParticleSystem o;
+	Parsys o;
 	Particle p;
 
 	e.seed(time(0));

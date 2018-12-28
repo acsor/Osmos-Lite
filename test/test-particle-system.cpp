@@ -1,5 +1,5 @@
 #include "../catch.hpp"
-#include "../ParticleSystem.hpp"
+#include "../Parsys.hpp"
 
 
 TEST_CASE("Particle::clashes()", "[Particle]") {
@@ -28,12 +28,12 @@ TEST_CASE("Particle::merge()", "[Particle]") {
 }
 
 
-TEST_CASE("ParticleSystem::update()", "[ParticleSystem]") {
-	ParticleSystem g{
-		Particle{1, 0, 1}, Particle{3, 0, 2}, Particle{6, 6, 1}
+TEST_CASE("Parsys::update()", "[Parsys]") {
+	Parsys g{
+		{1, 0, 1}, {3, 0, 2}, {6, 6, 1}
 	};
-	ParticleSystem expected{
-		Particle{2, 0, 3}, Particle{6, 6, 1}
+	Parsys expected{
+		{2, 0, 3}, {6, 6, 1}
 	};
 
 	g.update();
@@ -41,10 +41,10 @@ TEST_CASE("ParticleSystem::update()", "[ParticleSystem]") {
 	REQUIRE(g == expected);
 }
 
-TEST_CASE("ParticleSystem::contains()", "[ParticleSystem]") {
+TEST_CASE("Parsys::contains()", "[Parsys]") {
 	size_t const size = 3;
 	Particle ps[size] = {{0, 0, 1}, {-1, 1, 1}, {1, -1, 1}};
-	ParticleSystem s;
+	Parsys s;
 
 	for (size_t i = 0; i < size; i++) {
 		s.add(ps[i]);
