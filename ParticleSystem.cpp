@@ -85,6 +85,15 @@ bool ParticleSystem::add(Particle const &p) {
 	return false;
 }
 
+bool ParticleSystem::contains(Particle const &p) {
+	for (auto i = particles.begin(); i != particles.end(); i++) {
+		if (p == *i)
+			return true;
+	}
+	
+	return false;
+}
+
 void ParticleSystem::update() {
 	pair<Particle*, Particle*> p = findClash();
 

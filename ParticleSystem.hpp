@@ -44,6 +44,7 @@ class ParticleSystem: public Observable {
 		ParticleSystem();
 		ParticleSystem(initializer_list<Particle> in);
 		bool add(Particle const &p);
+		bool contains(Particle const &p);
 		void move(Particle *to_move, float xcoord, float ycord);
 		void advance(Particle *to_move, float xcoord, float ycoord);
 		void update();

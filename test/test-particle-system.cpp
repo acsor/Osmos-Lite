@@ -40,3 +40,16 @@ TEST_CASE("ParticleSystem::update()", "[ParticleSystem]") {
 	INFO(g.toString());
 	REQUIRE(g == expected);
 }
+
+TEST_CASE("ParticleSystem::contains()", "[ParticleSystem]") {
+	size_t const size = 3;
+	Particle ps[size] = {{0, 0, 1}, {-1, 1, 1}, {1, -1, 1}};
+	ParticleSystem s;
+
+	for (size_t i = 0; i < size; i++) {
+		s.add(ps[i]);
+		REQUIRE(s.contains(ps[i]));
+	}
+
+	REQUIRE(!s.contains(ps[0].merge(ps[1])));
+}
