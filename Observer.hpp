@@ -22,20 +22,20 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <set>
+#include <unordered_set>
 
 
 class Observer;
 
 /**
- * @brief A Subject base class as defined in the `Observer' pattern of the
- * GOF book `Design Patterns'.
+ * @brief A Subject base class as defined in the `Observer' pattern of the GOF
+ * book `Design Patterns'.
  *
  * TO-DO Document more, according to Doxygen.
  */
 class Observable {
 	private:
-		std::set<Observer*> watchers {};
+		std::unordered_set<Observer*> *watchers {nullptr};
 		int toggleNotify {0};
 	protected:
 		void virtual notify() const final;
@@ -43,6 +43,8 @@ class Observable {
 		void stopObserve();
 		void resumeObserve();
 	public:
+		// TO-DO Should move semantics be implemented in `Observable'?
+		Observable();
 		virtual ~Observable();
 
 		void virtual attach(Observer *o) final;
@@ -54,7 +56,7 @@ class Observable {
  */
 class Observer {
 	public:
-		virtual ~Observer();
+		virtual ~Observer() = 0;
 		void virtual onChange(Observable const *o) = 0;
 };
 

@@ -23,7 +23,13 @@
 #include "Observer.hpp"
 
 
+Observable::Observable() {
+	watchers = new std::unordered_set<Observer*>();
+}
+
 Observable::~Observable() {
+	if (watchers != nullptr)
+		delete watchers;
 }
 
 void Observable::notify() const {
@@ -32,7 +38,7 @@ void Observable::notify() const {
 	else if (toggleNotify < 0)
 		throw std::logic_error("resumeObserve() overused too many times");
 
-	for (auto i = watchers.begin(); i != watchers.end(); i++) {
+	for (auto i = watchers->begin(); i != watchers->end(); i++) {
 		(*i)->onChange(this);
 	}
 }
@@ -46,13 +52,9 @@ void Observable::resumeObserve() {
 }
 
 void Observable::attach(Observer *o) {
-	watchers.insert(o);
+	watchers->insert(o);
 }
 
 void Observable::detach(Observer *o) {
-	watchers.erase(o);
-}
-
-
-Observer::~Observer() {
+	watchers->erase(o);
 }
