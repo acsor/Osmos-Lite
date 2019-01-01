@@ -46,10 +46,6 @@ class Particle {
 		 */
 		void merge (Particle const &o);
 		bool operator== (Particle const &o) const;
-		/**
-		 * @brief Method supposedly needed by the stl. TO-DO Can it be removed?
-		 */
-		bool operator< (Particle const &o) const;
 
 		/**
 		 * @return `true` if the calling object is found within its particle
@@ -63,6 +59,7 @@ class Particle {
 		 * immediately merged.
 		 */
 		inline void attach();
+		void attach(Parsys &s);
 		inline float x() const;
 		inline float y() const;
 		inline float radius() const;
@@ -129,6 +126,7 @@ class Parsys: public Observable {
 
 		bool operator== (Parsys const &o) const;
 
+		// TO-DO Devise a more standard string-conversion mechanism.
 		string toString () const;
 };
 

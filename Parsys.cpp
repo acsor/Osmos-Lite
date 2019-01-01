@@ -58,9 +58,18 @@ inline bool Particle::attached() const {
 	return mSys != nullptr && mSys->contains(*this);
 }
 
+void Particle::attach(Parsys &s) {
+    if (mSys != nullptr) {
+		// Only one particle system at a time for a single particle
+    	mSys->erase(*this);
+    }
+
+    mSys = &s;
+    mSys->add(*this);
+}
+
 inline void Particle::attach() {
 	mSys->add(*this);
-	mSys->updateClashes();
 }
 
 inline float Particle::x() const {
@@ -94,9 +103,19 @@ void Particle::radius(float r) {
 }
 
 void Particle::shift(float xcomp, float ycomp) {
+	if (mSys != nullptr) {
+		mSys->stopObserve();
+		mSys->erase(*this);
+	}
+
 	mX += xcomp;
 	mY += ycomp;
-	mSys->updateClashes();
+
+	if (mSys != nullptr) {
+		mSys->add(*this);
+		mSys->resumeObserve();
+		mSys->updateClashes();
+	}
 }
 
 string Particle::toString () const {
@@ -160,7 +179,22 @@ Parsys::~Parsys() {
 }
 
 bool Parsys::add(Particle const &p) {
+	Particle old(0, 0, 1);
 	bool inserted = particles->insert(p).second;
+
+	// If it wasn't inserted, we assume that the very same particle already
+	// existed inside the system -- what is left is to increment its radius.
+	// (Can we rule out out-of-memory scenarios and other cases where `inserted
+	// == false' does not indicate an already present element?)
+    if (!inserted) {
+		stopObserve();
+
+		old = *particles->find(p);
+        particles->erase(old);
+		Particle(*this, old.mX, old.mY, 2 * old.mRadius);
+
+		resumeObserve();
+	}
 	updateClashes();
 
 	return inserted;

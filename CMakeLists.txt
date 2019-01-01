@@ -6,6 +6,9 @@ set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
 
+# TO-DO Add custom extension for executable types (e.g. make them end in
+# `.out') so as to simplify `.gitignore' rules.
+
 # configure_file(
 #     "ProjectConfig.hpp.in" "${PROJECT_BINARY_DIR}/ProjectConfig.hpp"
 # )

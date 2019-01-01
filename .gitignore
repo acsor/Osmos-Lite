@@ -15,3 +15,6 @@ CMake*
 scratch/
 Makefile
 Session.vim
+# TO-DO Have `utest' come out with an `.out' extension so that it doesn't
+# entail its own ignore rule.
+utest
