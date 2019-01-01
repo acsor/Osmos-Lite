@@ -1,4 +1,4 @@
-#include "../catch.hpp"
+#include "catch.hpp"
 #include "../Parsys.hpp"
 
 
@@ -24,32 +24,38 @@ TEST_CASE("Particle::nearby()", "[Particle]") {
 TEST_CASE("Particle::merge()", "[Particle]") {
 	Particle p{0, 1, 1}, q{1, 0, 1};
 
-	REQUIRE(p.merge(q) == Particle{0.5, 0.5, 2});
+	p.merge(q);
+	REQUIRE(p == Particle(0.5, 0.5, 2));
 }
 
 
-TEST_CASE("Parsys::update()", "[Parsys]") {
-	Parsys g{
-		{1, 0, 1}, {3, 0, 2}, {6, 6, 1}
-	};
-	Parsys expected{
-		{2, 0, 3}, {6, 6, 1}
-	};
+TEST_CASE("Parsys::updateClashes()", "[Parsys]") {
+	Parsys actual;
+	Parsys expected;
 
-	g.update();
-	INFO(g.toString());
-	REQUIRE(g == expected);
+	Particle(actual, 1, 0, 1);
+	Particle(actual, 3, 0, 2);
+	Particle(actual, 6, 6, 1);
+
+	Particle(expected, 2, 0, 3);
+	Particle(expected, 6, 6, 1);
+
+	INFO(actual.toString());
+	REQUIRE(actual == expected);
 }
 
 TEST_CASE("Parsys::contains()", "[Parsys]") {
-	size_t const size = 3;
-	Particle ps[size] = {{0, 0, 1}, {-1, 1, 1}, {1, -1, 1}};
 	Parsys s;
+	Particle ps[] = {
+		{s, -1, 1, 1}, {s, 2, -3, 1}, {s, 0, 6, 1}
+	};
+	const size_t size = sizeof(ps) / sizeof(Particle);
 
+	INFO("Looking inside " + s.toString() + " for... ");
 	for (size_t i = 0; i < size; i++) {
-		s.add(ps[i]);
+		INFO(ps[i].toString());
 		REQUIRE(s.contains(ps[i]));
 	}
 
-	REQUIRE(!s.contains(ps[0].merge(ps[1])));
+	// REQUIRE(!s.contains(ps[0].merge(ps[1])));
 }
