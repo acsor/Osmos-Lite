@@ -1,6 +1,6 @@
 // MIT License
 // 
-// Copyright (c) 2018 Oscar B. et al.
+// Copyright (c) 2018 Oscar.
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,15 @@ class Observer;
 class Observable {
 	private:
 		std::set<Observer*> watchers {};
+		int toggleNotify {0};
+	protected:
+		void virtual notify() const final;
+
+		void stopObserve();
+		void resumeObserve();
 	public:
 		virtual ~Observable();
 
-		void virtual notify() const final;
 		void virtual attach(Observer *o) final;
 		void virtual detach(Observer *o) final;
 };
