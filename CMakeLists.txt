@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 2.6)
+project(Osmos-Lite CXX)
+
+# We follow the Semver convention
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 0)
+
+# configure_file(
+#     "ProjectConfig.hpp.in" "${PROJECT_BINARY_DIR}/ProjectConfig.hpp"
+# )
+
+add_library(Observer Observer.cpp)
+
+add_library(Parsys Parsys.cpp)
+target_link_libraries(Parsys Observer)
+
+add_subdirectory(test)

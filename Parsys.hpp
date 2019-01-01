@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <cmath>
 #include <utility>
-#include "ProjectConfig.hpp"
 #include "Observer.hpp"
 
 // TO-DO Many a developer suggests that using-declarations ought to be removed
