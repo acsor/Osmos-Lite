@@ -110,6 +110,10 @@ class Parsys: public Observable {
 		void updateClashes();
 	public:
 		Parsys();
+		// TO-DO Learn more about move semantics and when they should be
+		// implemented.
+		Parsys(Parsys const &o);
+		Parsys(Parsys &&o);
 		virtual ~Parsys();
 		/**
 		 * @return `true` if `p` was successfully added as a new particle into
@@ -124,6 +128,8 @@ class Parsys: public Observable {
 		size_t size() const;
 		void toggleDetectClash();
 
+		Parsys& operator= (Parsys const &o);
+		Parsys& operator= (Parsys &&o);
 		bool operator== (Parsys const &o) const;
 
 		// TO-DO Devise a more standard string-conversion mechanism.

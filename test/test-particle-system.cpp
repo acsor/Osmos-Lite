@@ -46,6 +46,18 @@ TEST_CASE("Particle::merge()", "[Particle]") {
 }
 
 
+TEST_CASE("Parsys::Parsys()", "[Parsys]") {
+	Parsys p, q;
+
+	Particle(p, 0, 0, 1);
+	Particle(p, 10, 0, 1);
+	Particle(p, 0, 10, 1);
+
+    q = p;
+
+    REQUIRE(p == q);
+}
+
 TEST_CASE("Parsys::updateClashes()", "[Parsys]") {
 	Parsys actual, expected;
 

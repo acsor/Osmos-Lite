@@ -173,6 +173,26 @@ Parsys::Parsys() {
 	particles = new unordered_set<Particle>();
 }
 
+Parsys::Parsys(Parsys const &o) {
+	if (particles != nullptr) {
+		delete particles;
+	}
+
+	particles = new unordered_set<Particle>(*o.particles);
+	mDetectClash = o.mDetectClash;
+}
+
+Parsys::Parsys(Parsys &&o) {
+	if (particles != nullptr) {
+		delete particles;
+	}
+
+	particles = o.particles;
+	mDetectClash = o.mDetectClash;
+
+	o.particles = new unordered_set<Particle>();
+}
+
 Parsys::~Parsys() {
 	if (particles != nullptr)
 		delete particles;
@@ -243,6 +263,30 @@ void Parsys::updateClashes() {
 
 	resumeObserve();
 	notify();
+}
+
+Parsys& Parsys::operator= (Parsys const &o) {
+	if (particles != nullptr) {
+		delete particles;
+	}
+
+	particles = new unordered_set<Particle>(*o.particles);
+	mDetectClash = o.mDetectClash;
+
+	return *this;
+}
+
+Parsys& Parsys::operator= (Parsys &&o) {
+    if (particles != nullptr) {
+    	delete particles;
+    }
+
+    particles = o.particles;
+    mDetectClash = o.mDetectClash;
+
+    o.particles = new unordered_set<Particle>();
+
+    return *this;
 }
 
 bool Parsys::operator== (Parsys const &g) const {
