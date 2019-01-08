@@ -58,3 +58,7 @@ void Observable::attach(Observer *o) {
 void Observable::detach(Observer *o) {
 	watchers->erase(o);
 }
+
+
+Observer::~Observer() {
+}

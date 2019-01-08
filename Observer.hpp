@@ -37,26 +37,25 @@ class Observable {
 	private:
 		std::unordered_set<Observer*> *watchers {nullptr};
 		int toggleNotify {0};
-	protected:
-		void virtual notify() const final;
-
-		void stopObserve();
-		void resumeObserve();
 	public:
 		// TO-DO Should move semantics be implemented in `Observable'?
 		Observable();
 		virtual ~Observable();
 
+		void virtual notify() const final;
 		void virtual attach(Observer *o) final;
 		void virtual detach(Observer *o) final;
-};
+
+		void stopObserve();
+		void resumeObserve();
+	};
 
 /**
  * TO-DO Document.
  */
 class Observer {
 	public:
-		virtual ~Observer() = 0;
+		virtual ~Observer();
 		void virtual onChange(Observable const *o) = 0;
 };
 
