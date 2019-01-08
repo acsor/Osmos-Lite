@@ -54,7 +54,7 @@ bool Particle::operator== (Particle const &o) const {
 	return mX == o.mX && mY == o.mY && mRadius == o.mRadius;
 }
 
-inline bool Particle::attached() const {
+bool Particle::attached() const {
 	return mSys != nullptr && mSys->contains(*this);
 }
 
@@ -68,19 +68,19 @@ void Particle::attach(Parsys &s) {
     mSys->add(*this);
 }
 
-inline void Particle::attach() {
+void Particle::attach() {
 	mSys->add(*this);
 }
 
-inline float Particle::x() const {
+float Particle::x() const {
 	return mX;
 }
 
-inline float Particle::y() const {
+float Particle::y() const {
 	return mY;
 }
 
-inline float Particle::radius() const {
+float Particle::radius() const {
 	return mRadius;
 }
 
@@ -150,7 +150,7 @@ bool ParticleEdge::operator== (ParticleEdge const &e) const {
 }
 
 
-inline pair<Particle*, Particle*> Parsys::findClash() const {
+pair<Particle*, Particle*> Parsys::findClash() const {
 	// TO-DO There are at least a couple of objectives that a more performant
 	// and accurate implementation of this model should follow:
 	// 1. For performance's sake, a repetition of nested for-loops (as it

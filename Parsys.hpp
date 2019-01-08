@@ -51,18 +51,20 @@ class Particle {
 		 * @return `true` if the calling object is found within its particle
 		 * system.
 		 */
-		inline bool attached() const;
+		bool attached() const;
 		/**
 		 * @brief Attaches the current Particle to the belonging particle
 		 * system. Note that the newly attached particle might not be found
 		 * into the system even right after this call if, for example, it gets
 		 * immediately merged.
 		 */
-		inline void attach();
+		void attach();
 		void attach(Parsys &s);
-		inline float x() const;
-		inline float y() const;
-		inline float radius() const;
+		// TO-DO Making some of the calls below `inline' causes the linker to
+		// not... link. Find out why and fix the issue.
+		float x() const;
+		float y() const;
+		float radius() const;
 		void x(float x);
 		void y(float y);
 		void radius(float r);
