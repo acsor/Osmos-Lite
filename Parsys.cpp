@@ -265,6 +265,14 @@ void Parsys::updateClashes() {
 	notify();
 }
 
+Parsys::const_iterator Parsys::cbegin() const {
+    return particles->cbegin();
+}
+
+Parsys::const_iterator Parsys::cend() const {
+	return particles->cend();
+}
+
 Parsys& Parsys::operator= (Parsys const &o) {
 	if (particles != nullptr) {
 		delete particles;

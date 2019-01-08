@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include "catch.hpp"
 #include "../Parsys.hpp"
 
@@ -125,4 +126,18 @@ TEST_CASE("Parsys::erase()", "[Parsys]") {
 	}
 
 	REQUIRE(s.size() == 0);
+}
+
+TEST_CASE("Parsys::cbegin() Parsys::cend()", "[Parsys]") {
+	Parsys s;
+    unordered_set<Particle> ps = unordered_set<Particle>{
+		Particle(s, 0, 0, 1), Particle(s, 10, 0, 1), Particle(s, 0, 10, 1),
+		Particle(s, -10, 0, 1), Particle(s, 0, -10, 1),
+    };
+
+    REQUIRE(s.size() == ps.size());
+    // Note that the Parsys::cend() method is tested as well.
+	for (auto i = s.cbegin(); i != s.cend(); i++) {
+		REQUIRE(ps.find(*i) != ps.end());
+	}
 }

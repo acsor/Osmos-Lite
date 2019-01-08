@@ -109,6 +109,8 @@ class Parsys: public Observable {
 	protected:
 		void updateClashes();
 	public:
+		typedef unordered_set<Particle>::const_iterator const_iterator;
+
 		Parsys();
 		// TO-DO Learn more about move semantics and when they should be
 		// implemented.
@@ -127,6 +129,11 @@ class Parsys: public Observable {
 		bool contains(Particle const &p) const;
 		size_t size() const;
 		void toggleDetectClash();
+
+		// TO-DO Study more carefully iterator mechanisms and all their prior
+		// basics (including Generic Programming and whatnot).
+		const_iterator cbegin() const;
+		const_iterator cend() const;
 
 		Parsys& operator= (Parsys const &o);
 		Parsys& operator= (Parsys &&o);
