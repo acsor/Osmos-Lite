@@ -9,7 +9,7 @@ using namespace sf;
 
 int main (int argc, char *argv[]) {
 	Parsys p = UnirandParsysGen(200, 0, 400, 2).generate();
-	Particle controlled{p, 0, 0, 1};
+	Particle controlled{p, 0, 0, 1.5};
 
 	RenderWindow w(VideoMode(640, 400), "Osmos");
 	ParsysView const v{p, controlled};
@@ -24,9 +24,30 @@ int main (int argc, char *argv[]) {
 	while (w.isOpen()) {
 		while (w.pollEvent(e)) {
 			switch (e.type) {
-				case (Event::Closed):
+				case Event::Closed:
 					w.close();
 					break;
+				case Event::KeyPressed:
+					switch (e.key.code) {
+						case Keyboard::Numpad2:
+						case Keyboard::S:
+                            controlled.shift(0, 0.5);
+							break;
+						case Keyboard::Numpad4:
+						case Keyboard::A:
+							controlled.shift(-0.5, 0);
+							break;
+						case Keyboard::Numpad6:
+						case Keyboard::D:
+							controlled.shift(0.5, 0);
+							break;
+						case Keyboard::Numpad8:
+						case Keyboard::W:
+							controlled.shift(0, -0.5);
+							break;
+						default:
+							break;
+					}
 				default:
 					break;
 			}
