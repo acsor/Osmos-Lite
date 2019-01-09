@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
 #include "ParsysView.hpp"
@@ -9,10 +10,14 @@ using namespace sf;
 
 
 int main (int argc, char *argv[]) {
-	Parsys p = UnirandParsysGen(200, 0, 900, 2).generate();
+	VideoMode const desktopMode = VideoMode::getDesktopMode();
+
+	Parsys p = UnirandParsysGen(
+		300, 0, max(desktopMode.width, desktopMode.height), 4
+	).generate();
     weak_ptr<Particle> controlled = *p.cbegin();
 
-	RenderWindow w(VideoMode(1024, 768), "Osmos");
+	RenderWindow w(desktopMode, "Osmos");
 	ParsysView const v{p, controlled};
 	Event e;
 

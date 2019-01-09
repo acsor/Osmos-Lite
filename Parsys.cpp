@@ -129,7 +129,7 @@ pair<Particle*, Particle*> Parsys::findClash() const {
 	// and accurate implementation of this model should follow:
 	// 1. For performance's sake, a repetition of nested for-loops (as it
 	// happens within updateClashes()) should be avoided;
-	// 2. A hierarchy of clash orders should be defined when three or more
+	// 2. A hierarchy of clash orders should be established when three or more
 	// particles clash at the same time.
 	for (auto a = mParticles->begin(); a != mParticles->end(); a++) {
 		for (auto b = mParticles->begin(); b != mParticles->end(); b++) {
@@ -341,9 +341,6 @@ Parsys UnirandParsysGen::generate () {
 	for (size_t i = 0; i < n; i++) {
 		o.particle(xd(e), yd(e), abs(radiusd(e)));
 	}
-
-	// TO-DO Watch out! Won't the default copy constructor have `o' destroy the
-	// shared memory area pointed to by `o.mParticles'?
 
 	return o;
 }
