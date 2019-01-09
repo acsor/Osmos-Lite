@@ -22,6 +22,7 @@ add_library(ParsysView ParsysView.cpp)
 target_link_libraries(ParsysView Parsys Observer)
 
 add_library(EventManager EventManager.cpp)
+target_link_libraries(EventManager Parsys ParsysView Observer)
 
 add_executable(osmos main.cpp)
 target_link_libraries(
