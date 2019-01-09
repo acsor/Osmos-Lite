@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
 #include "ParsysView.hpp"
@@ -8,10 +9,10 @@ using namespace sf;
 
 
 int main (int argc, char *argv[]) {
-	Parsys p = UnirandParsysGen(200, 0, 400, 2).generate();
-	Particle controlled{p, 0, 0, 1.5};
+	Parsys p = UnirandParsysGen(200, 0, 900, 2).generate();
+    weak_ptr<Particle> controlled = *p.cbegin();
 
-	RenderWindow w(VideoMode(640, 400), "Osmos");
+	RenderWindow w(VideoMode(1024, 768), "Osmos");
 	ParsysView const v{p, controlled};
 	Event e;
 
@@ -28,22 +29,25 @@ int main (int argc, char *argv[]) {
 					w.close();
 					break;
 				case Event::KeyPressed:
+					if (controlled.expired())
+						break;
+
 					switch (e.key.code) {
 						case Keyboard::Numpad2:
 						case Keyboard::S:
-                            controlled.shift(0, 0.5);
+                            controlled.lock()->shift(0, 3);
 							break;
 						case Keyboard::Numpad4:
 						case Keyboard::A:
-							controlled.shift(-0.5, 0);
+							controlled.lock()->shift(-3, 0);
 							break;
 						case Keyboard::Numpad6:
 						case Keyboard::D:
-							controlled.shift(0.5, 0);
+							controlled.lock()->shift(3, 0);
 							break;
 						case Keyboard::Numpad8:
 						case Keyboard::W:
-							controlled.shift(0, -0.5);
+							controlled.lock()->shift(0, -3);
 							break;
 						default:
 							break;
@@ -57,6 +61,8 @@ int main (int argc, char *argv[]) {
 		w.draw(v);
 		w.display();
 	}
+
+	cout << "Closed with " << p.size() << " particles." << endl;
 
 	return EXIT_SUCCESS;
 }
