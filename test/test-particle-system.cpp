@@ -23,72 +23,84 @@ TEST_CASE("Particle::nearby()", "[Particle]") {
 }
 
 TEST_CASE("Particle::merge()", "[Particle]") {
-	Parsys s;
 	Particle p{0, 10, 1}, q{10, 0, 1};
+	Parsys s{10};
+	shared_ptr<Particle> t = s.particle(0, 10, 1).lock(),
+	        u = s.particle(10, 0, 1).lock();
 
-	SECTION("Unbound particles") {
-		p.merge(q);
-		REQUIRE(p == Particle(5, 5, 2));
-	}
+	// Unbound particles
+	p.merge(q);
+	REQUIRE(p == Particle(5, 5, 2));
 
-	SECTION("Bound particles") {
-        p.attach(s);
-		q.attach(s);
+	// Bound particles
+	INFO(s.toString());
+	REQUIRE(s.contains(*t));
+	REQUIRE(s.contains(*u));
+	REQUIRE(s.size() == 2);
 
-		INFO(s.toString());
-		REQUIRE(s.contains(p));
-		REQUIRE(s.contains(q));
-		REQUIRE(s.size() == 2);
-
-		p.merge(q);
-		REQUIRE(s.contains(p));
-		REQUIRE(s.size() == 1);
-	}
+	t->merge(*u);
+	INFO(s.toString());
+	REQUIRE(t->x() == 5);
+	REQUIRE(t->y() == 5);
+	REQUIRE(t->radius() == 2);
+	REQUIRE(s.contains(*t));
+	REQUIRE(s.size() == 1);
 }
 
 
 TEST_CASE("Parsys::Parsys()", "[Parsys]") {
-	Parsys p, q;
+	Parsys s{10}, r{10};
+	shared_ptr<Particle> p;
 
-	Particle(p, 0, 0, 1);
-	Particle(p, 10, 0, 1);
-	Particle(p, 0, 10, 1);
+	SECTION("Copy assignment") {
+		s.particle(0, 0, 1);
+		s.particle(10, 0, 1);
+		s.particle(0, 10, 1);
 
-    q = p;
+		r = s;
 
-    REQUIRE(p == q);
+		REQUIRE(s == r);
+	}
+
+	SECTION("Duplicate element") {
+		s.particle(0, 0, 1);
+		p = s.particle(0, 0, 1).lock();
+
+		INFO(p->toString());
+		REQUIRE(*p == Particle(0, 0, 2));
+	}
 }
 
 TEST_CASE("Parsys::updateClashes()", "[Parsys]") {
-	Parsys actual, expected;
+	Parsys actual{10}, expected{10};
 
 	SECTION("Multiple simple particles") {
-		Particle(actual, 1, 0, 1);
-		Particle(actual, 3, 0, 2);
-		Particle(actual, 6, 6, 1);
+		actual.particle(1, 0, 1);
+		actual.particle(3, 0, 2);
+		actual.particle(6, 6, 1);
 
-		Particle(expected, 2, 0, 3);
-		Particle(expected, 6, 6, 1);
+		expected.particle(2, 0, 3);
+		expected.particle(6, 6, 1);
 
 		INFO(actual.toString());
 		REQUIRE(actual == expected);
 	}
 
 	SECTION("Variable-radius particles centered around the same point") {
-		Particle(actual, 10, 10, 4);
-		Particle(actual, 10, 10, 5);
-		Particle(actual, 10, 10, 6);
-		Particle(expected, 10, 10, 15);
+		actual.particle(10, 10, 4);
+		actual.particle(10, 10, 5);
+		actual.particle(10, 10, 6);
+		expected.particle(10, 10, 15);
 
 		INFO(actual.toString());
 		REQUIRE(actual == expected);
 	}
 
 	SECTION("Single repeated particle with constant radius") {
-		Particle(actual, 10, 10, 5);
-		Particle(actual, 10, 10, 5);
-		Particle(actual, 10, 10, 5);
-		Particle(expected, 10, 10, 15);
+		actual.particle(10, 10, 5);
+		actual.particle(10, 10, 5);
+		actual.particle(10, 10, 5);
+		expected.particle(10, 10, 15);
 
 		INFO(actual.toString());
 		REQUIRE(actual == expected);
@@ -96,32 +108,35 @@ TEST_CASE("Parsys::updateClashes()", "[Parsys]") {
 }
 
 TEST_CASE("Parsys::contains()", "[Parsys]") {
-	Parsys s;
-	Particle ps[] = {
-		{s, -1, 1, 1}, {s, 2, -3, 1}, {s, 0, 6, 1},
-		{s, -10, 10, 1}, {s, 2, -30, 1}, {s, 0, 60, 15},
+	Parsys s{10};
+	shared_ptr<Particle> ps[] = {
+		s.particle(-1, 1, 1).lock(), s.particle(2, -3, 1).lock(),
+		s.particle(0, 6, 1).lock(), s.particle(-10, 10, 1).lock(),
+		s.particle(2, -30, 1).lock(), s.particle(0, 60, 15).lock(),
 	};
 	const size_t size = sizeof(ps) / sizeof(Particle);
 
 	INFO("Looking inside " + s.toString() + " for... ");
 	for (size_t i = 0; i < size; i++) {
-		INFO(ps[i].toString());
-		REQUIRE(s.contains(ps[i]));
+		INFO(ps[i]->toString());
+		REQUIRE(s.contains(*ps[i]));
 	}
 
 	// REQUIRE(!s.contains(ps[0].merge(ps[1])));
 }
 
 TEST_CASE("Parsys::erase()", "[Parsys]") {
-	Parsys s;
-	Particle ps[] = {
-		{s, -1, 1, 1}, {s, 2, -3, 1}, {s, 0, 6, 1},
-		{s, -10, 10, 1}, {s, 2, -30, 1}, {s, 0, 60, 15},
+	Parsys s{10};
+	shared_ptr<Particle> ps[] = {
+		s.particle(-1, 1, 1).lock(), s.particle(2, -3, 1).lock(),
+		s.particle(0, 6, 1).lock(), s.particle(-10, 10, 1).lock(),
+		s.particle(2, -30, 1).lock(), s.particle(0, 60, 15).lock(),
 	};
-	const size_t size = sizeof(ps) / sizeof(Particle);
+	const size_t size = sizeof(ps) / sizeof(shared_ptr<Particle>);
 
 	for (size_t i = 0; i < size; i++) {
-		s.erase(ps[i]);
+		s.erase(*ps[i]);
+		REQUIRE(s.contains(*ps[i]) == false);
 		REQUIRE(s.size() == size - 1 - i);
 	}
 
@@ -129,10 +144,11 @@ TEST_CASE("Parsys::erase()", "[Parsys]") {
 }
 
 TEST_CASE("Parsys::cbegin() Parsys::cend()", "[Parsys]") {
-	Parsys s;
-    unordered_set<Particle> ps = unordered_set<Particle>{
-		Particle(s, 0, 0, 1), Particle(s, 10, 0, 1), Particle(s, 0, 10, 1),
-		Particle(s, -10, 0, 1), Particle(s, 0, -10, 1),
+	Parsys s{10};
+    unordered_set<shared_ptr<Particle>> ps {
+		s.particle(0, 0, 1).lock(), s.particle(10, 0, 1).lock(),
+		s.particle(0, 10, 1).lock(), s.particle(-10, 0, 1).lock(),
+		s.particle(0, -10, 1).lock(),
     };
 
     REQUIRE(s.size() == ps.size());

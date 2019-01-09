@@ -8,68 +8,44 @@
 Particle::Particle(Parsys &s, float x, float y, float radius):
 	Particle(x, y, radius) {
 	mSys = &s;
-	attach();
 }
 
 Particle::Particle(float x, float y, float radius) {
 	if (radius <= 0)
 		throw invalid_argument("radius must be a positive non-zero argument");
 
-	mSys = nullptr;
 	mX = x;
 	mY = y;
 	mRadius = radius;
 }
 
 bool Particle::clashes (Particle const &o) const {
-	return sqrt(pow(mX - o.mX, 2) + pow(mY - o.mY, 2)) <=
-		mRadius + o.mRadius;
+	return sqrt(pow(mX - o.mX, 2) + pow(mY - o.mY, 2)) <= mRadius + o.mRadius;
 }
 
 bool Particle::nearby (Particle const &o, float whence) const {
 	return sqrt(pow(mX - o.mX, 2) + pow(mY - o.mY, 2)) <= whence;
 }
 
-void Particle::merge (Particle const &o) {
+void Particle::merge (Particle &o) {
 	if (mSys != o.mSys)
 		throw invalid_argument("Argument particle not within the same system");
-
-	if (mSys != nullptr) {
-		mSys->stopObserve();
-		mSys->erase(*this);
-		mSys->erase(o);
-	}
 
 	mX = (mX + o.mX) / 2;
 	mY = (mY + o.mY) / 2;
 	mRadius += o.mRadius;
 
 	if (mSys != nullptr) {
-		mSys->add(*this);
+		mSys->stopObserve();
+		mSys->erase(o);
+		mSys->updateClashes();
 		mSys->resumeObserve();
+		mSys->notify();
 	}
 }
 
 bool Particle::operator== (Particle const &o) const {
 	return mX == o.mX && mY == o.mY && mRadius == o.mRadius;
-}
-
-bool Particle::attached() const {
-	return mSys != nullptr && mSys->contains(*this);
-}
-
-void Particle::attach(Parsys &s) {
-    if (mSys != nullptr) {
-		// Only one particle system at a time for a single particle
-    	mSys->erase(*this);
-    }
-
-    mSys = &s;
-    mSys->add(*this);
-}
-
-void Particle::attach() {
-	mSys->add(*this);
 }
 
 float Particle::x() const {
@@ -86,12 +62,16 @@ float Particle::radius() const {
 
 void Particle::x(float x) {
 	mX = x;
-	mSys->updateClashes();
+
+	if (mSys != nullptr)
+		mSys->updateClashes();
 }
 
 void Particle::y(float y) {
 	mY = y;
-	mSys->updateClashes();
+
+	if (mSys != nullptr)
+		mSys->updateClashes();
 }
 
 void Particle::radius(float r) {
@@ -99,23 +79,17 @@ void Particle::radius(float r) {
 		throw invalid_argument("radius must be a positive non-zero argument");
 
 	mRadius = r;
-	mSys->updateClashes();
+
+	if (mSys != nullptr)
+		mSys->updateClashes();
 }
 
 void Particle::shift(float xcomp, float ycomp) {
-	if (mSys != nullptr) {
-		mSys->stopObserve();
-		mSys->erase(*this);
-	}
-
 	mX += xcomp;
 	mY += ycomp;
 
-	if (mSys != nullptr) {
-		mSys->add(*this);
-		mSys->resumeObserve();
+	if (mSys != nullptr)
 		mSys->updateClashes();
-	}
 }
 
 string Particle::toString () const {
@@ -157,11 +131,11 @@ pair<Particle*, Particle*> Parsys::findClash() const {
 	// happens within updateClashes()) should be avoided;
 	// 2. A hierarchy of clash orders should be defined when three or more
 	// particles clash at the same time.
-	for (auto a = particles->begin(); a != particles->end(); a++) {
-		for (auto b = particles->begin(); b != particles->end(); b++) {
-			if (a != b && a->clashes(*b))
+	for (auto a = mParticles->begin(); a != mParticles->end(); a++) {
+		for (auto b = mParticles->begin(); b != mParticles->end(); b++) {
+			if (a != b && (*a)->clashes(**b))
 				return pair<Particle*, Particle*>(
-					(Particle*)&(*a), (Particle*)&(*b)
+					(Particle*)&(**a), (Particle*)&(**b)
 				);
 		}
 	}
@@ -169,70 +143,84 @@ pair<Particle*, Particle*> Parsys::findClash() const {
 	return pair<Particle*, Particle*>(nullptr, nullptr);
 }
 
-Parsys::Parsys() {
-	particles = new unordered_set<Particle>();
+Parsys::Parsys(size_t capacity) {
+	mParticles = new vector<shared_ptr<Particle>>();
+	mParticles->reserve(capacity);
+
+	if (mParticles->capacity() != capacity) {
+        throw length_error(
+			"Couldn't allocate enough memory for the particles"
+		);
+	}
 }
 
 Parsys::Parsys(Parsys const &o) {
-	if (particles != nullptr) {
-		delete particles;
-	}
+	if (mParticles != nullptr)
+		delete mParticles;
 
-	particles = new unordered_set<Particle>(*o.particles);
+	mParticles = new vector<shared_ptr<Particle>>();
+	mParticles->reserve(o.mParticles->capacity());
+	mParticles->assign(o.mParticles->cbegin(), o.mParticles->cend());
 	mDetectClash = o.mDetectClash;
 }
 
 Parsys::Parsys(Parsys &&o) {
-	if (particles != nullptr) {
-		delete particles;
-	}
+	if (mParticles != nullptr)
+		delete mParticles;
 
-	particles = o.particles;
+	// TO-DO Warning: won't the Particle instances in `o' maintain their
+	// references to the old Parsys object?
+	mParticles = o.mParticles;
 	mDetectClash = o.mDetectClash;
 
-	o.particles = new unordered_set<Particle>();
+	o.mParticles = new vector<shared_ptr<Particle>>();
+	o.mParticles->reserve(mParticles->capacity());
 }
 
 Parsys::~Parsys() {
-	if (particles != nullptr)
-		delete particles;
+	if (mParticles != nullptr)
+		delete mParticles;
 }
 
-bool Parsys::add(Particle const &p) {
-	Particle old(0, 0, 1);
-	bool inserted = particles->insert(p).second;
-
-	// If it wasn't inserted, we assume that the very same particle already
-	// existed inside the system -- what is left is to increment its radius.
-	// (Can we rule out out-of-memory scenarios and other cases where `inserted
-	// == false' does not indicate an already present element?)
-    if (!inserted) {
-		stopObserve();
-
-		old = *particles->find(p);
-        particles->erase(old);
-		Particle(*this, old.mX, old.mY, 2 * old.mRadius);
-
-		resumeObserve();
-	}
+weak_ptr<Particle> Parsys::particle(float x, float y, float radius) {
+    mParticles->push_back(
+		shared_ptr<Particle>(new Particle(*this, x, y, radius))
+	);
 	updateClashes();
 
-	return inserted;
+    return mParticles->back();
 }
 
-bool Parsys::erase(Particle const &p) {
-	bool erased = particles->erase(p) > 0;
-	notify();
+bool Parsys::erase(Particle &p) {
+	auto i = mParticles->begin();
 
-	return erased;
+    while (i != mParticles->end()) {
+    	if (**i == p) {
+            mParticles->erase(i);
+            break;
+    	}
+    	i++;
+    }
+
+    if (i != mParticles->end()) {
+		notify();
+		return true;
+	}
+
+	return false;
 }
 
 bool Parsys::contains(Particle const &p) const {
-	return p.mSys == this && particles->find(p) != particles->end();
+    for (auto i = mParticles->begin(); i != mParticles->end(); i++) {
+    	if (**i == p)
+    		return true;
+    }
+
+    return false;
 }
 
 size_t Parsys::size() const {
-	return particles->size();
+	return mParticles->size();
 }
 
 void Parsys::toggleDetectClash() {
@@ -266,46 +254,62 @@ void Parsys::updateClashes() {
 }
 
 Parsys::const_iterator Parsys::cbegin() const {
-    return particles->cbegin();
+    return mParticles->cbegin();
 }
 
 Parsys::const_iterator Parsys::cend() const {
-	return particles->cend();
+	return mParticles->cend();
 }
 
 Parsys& Parsys::operator= (Parsys const &o) {
-	if (particles != nullptr) {
-		delete particles;
+	if (mParticles != nullptr) {
+		delete mParticles;
 	}
 
-	particles = new unordered_set<Particle>(*o.particles);
+	mParticles = new vector<shared_ptr<Particle>>();
+	mParticles->resize(
+		o.mParticles->capacity(),
+		shared_ptr<Particle>(new Particle(0, 0, 1E-9))
+	);
+	mParticles->assign(o.mParticles->cbegin(), o.mParticles->cend());
 	mDetectClash = o.mDetectClash;
 
 	return *this;
 }
 
 Parsys& Parsys::operator= (Parsys &&o) {
-    if (particles != nullptr) {
-    	delete particles;
+    if (mParticles != nullptr) {
+    	delete mParticles;
     }
 
-    particles = o.particles;
+    mParticles = o.mParticles;
     mDetectClash = o.mDetectClash;
 
-    o.particles = new unordered_set<Particle>();
+    o.mParticles = new vector<shared_ptr<Particle>>();
+    o.mParticles->reserve(o.mParticles->capacity());
 
     return *this;
 }
 
 bool Parsys::operator== (Parsys const &g) const {
-	return *particles == *(g.particles);
+	for (auto i = mParticles->begin(); i != mParticles->end(); i++) {
+		if (!g.contains(**i))
+			return false;
+	}
+
+    for (auto i = g.mParticles->begin(); i != g.mParticles->end(); i++) {
+    	if (!contains(**i))
+    		return false;
+    }
+
+    return true;
 }
 
 string Parsys::toString () const {
 	string o {""};
 
-	for (auto i = particles->begin(); i != particles->end(); i++) {
-		o += i->toString() + " ";
+	for (auto i = mParticles->cbegin(); i != mParticles->cend(); i++) {
+		o += (*i)->toString() + " ";
 	}
 
 	return o;
@@ -329,17 +333,17 @@ Parsys UnirandParsysGen::generate () {
 	uniform_real_distribution<float> xd{min, max}, yd{min, max};
 	normal_distribution<float> radiusd{radius_mean, radius_stddev};
 	default_random_engine e;
-	Parsys o;
+	Parsys o{n};
 	// TO-DO Generate particles such that they don't clash together.
 
 	e.seed(time(0));
 
 	for (size_t i = 0; i < n; i++) {
-		Particle(o, xd(e), yd(e), abs(radiusd(e)));
+		o.particle(xd(e), yd(e), abs(radiusd(e)));
 	}
 
 	// TO-DO Watch out! Won't the default copy constructor have `o' destroy the
-	// shared memory area pointed to by `o.particles'?
+	// shared memory area pointed to by `o.mParticles'?
 
 	return o;
 }
