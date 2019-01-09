@@ -1,6 +1,6 @@
 # Osmos Lite
 Personal and hobbyst remake of the multi-platform game
-[Osmos](https://play.google.com/store/apps/details?id=com.hemispheregames.osmosdemo).
+[Osmos](https://osmos-game.com/).
 
 A repository just for educational purposes and not aimed at redistribution. All
 rights to the name *Osmos* are henceforth reserved to their respective owners.
