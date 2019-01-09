@@ -14,19 +14,19 @@ void CParticleManager::manage(Event &e) {
 		switch (e.key.code) {
 			case Keyboard::Numpad2:
 			case Keyboard::S:
-				mControlled.lock()->move(0, 3);
+				mControlled.lock()->move(0, STEP_SIZE);
 				break;
 			case Keyboard::Numpad4:
 			case Keyboard::A:
-				mControlled.lock()->move(-3, 0);
+				mControlled.lock()->move(-STEP_SIZE, 0);
 				break;
 			case Keyboard::Numpad6:
 			case Keyboard::D:
-				mControlled.lock()->move(3, 0);
+				mControlled.lock()->move(STEP_SIZE, 0);
 				break;
 			case Keyboard::Numpad8:
 			case Keyboard::W:
-				mControlled.lock()->move(0, -3);
+				mControlled.lock()->move(0, -STEP_SIZE);
 				break;
 			default:
 				break;

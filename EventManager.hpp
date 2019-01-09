@@ -18,6 +18,8 @@ class EventManager {
 class CParticleManager: public EventManager {
 	private:
 		weak_ptr<Particle> mControlled;
+
+		static constexpr float STEP_SIZE = 10;
 	public:
 		CParticleManager(weak_ptr<Particle> controlled);
 		void manage(Event &e) override;
