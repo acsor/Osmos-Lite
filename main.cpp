@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
 #include "ParsysView.hpp"
+#include "EventManager.hpp"
 
 using namespace std;
 using namespace sf;
@@ -18,8 +19,11 @@ int main (int argc, char *argv[]) {
     weak_ptr<Particle> controlled = *p.cbegin();
 
 	RenderWindow w(desktopMode, "Osmos");
-	ParsysView const v{p, controlled};
+	WindowManager wManager{w};
+	CParticleManager cManager{controlled};
 	Event e;
+
+	ParsysView const v{p, controlled};
 
 	// TO-DO Find out why there's the need to notify an additional time.
 	p.notify();
@@ -29,37 +33,8 @@ int main (int argc, char *argv[]) {
 
 	while (w.isOpen()) {
 		while (w.pollEvent(e)) {
-			switch (e.type) {
-				case Event::Closed:
-					w.close();
-					break;
-				case Event::KeyPressed:
-					if (controlled.expired())
-						break;
-
-					switch (e.key.code) {
-						case Keyboard::Numpad2:
-						case Keyboard::S:
-							controlled.lock()->move(0, 3);
-							break;
-						case Keyboard::Numpad4:
-						case Keyboard::A:
-							controlled.lock()->move(-3, 0);
-							break;
-						case Keyboard::Numpad6:
-						case Keyboard::D:
-							controlled.lock()->move(3, 0);
-							break;
-						case Keyboard::Numpad8:
-						case Keyboard::W:
-							controlled.lock()->move(0, -3);
-							break;
-						default:
-							break;
-					}
-				default:
-					break;
-			}
+			wManager.manage(e);
+			cManager.manage(e);
 		}
 
 		w.clear();

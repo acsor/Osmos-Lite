@@ -21,10 +21,13 @@ target_link_libraries(Parsys Observer)
 add_library(ParsysView ParsysView.cpp)
 target_link_libraries(ParsysView Parsys Observer)
 
+add_library(EventManager EventManager.cpp)
+
 add_executable(osmos main.cpp)
 target_link_libraries(
 	osmos
-	Parsys ParsysView Observer sfml-graphics sfml-window sfml-system
+	Parsys ParsysView Observer EventManager
+    sfml-graphics sfml-window sfml-system
 )
 
 add_subdirectory(test)
