@@ -40,19 +40,19 @@ int main (int argc, char *argv[]) {
 					switch (e.key.code) {
 						case Keyboard::Numpad2:
 						case Keyboard::S:
-                            controlled.lock()->shift(0, 3);
+							controlled.lock()->move(0, 3);
 							break;
 						case Keyboard::Numpad4:
 						case Keyboard::A:
-							controlled.lock()->shift(-3, 0);
+							controlled.lock()->move(-3, 0);
 							break;
 						case Keyboard::Numpad6:
 						case Keyboard::D:
-							controlled.lock()->shift(3, 0);
+							controlled.lock()->move(3, 0);
 							break;
 						case Keyboard::Numpad8:
 						case Keyboard::W:
-							controlled.lock()->shift(0, -3);
+							controlled.lock()->move(0, -3);
 							break;
 						default:
 							break;

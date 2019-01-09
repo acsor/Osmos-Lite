@@ -84,7 +84,7 @@ void Particle::radius(float r) {
 		mSys->updateClashes();
 }
 
-void Particle::shift(float xcomp, float ycomp) {
+void Particle::move(float xcomp, float ycomp) {
 	mX += xcomp;
 	mY += ycomp;
 

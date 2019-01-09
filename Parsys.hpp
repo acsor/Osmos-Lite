@@ -58,7 +58,7 @@ class Particle {
 		void y(float y);
 		void radius(float r);
 
-		void shift(float xcomp, float ycomp);
+		void move(float xcomp, float ycomp);
 
 		string toString() const;
 };
