@@ -12,15 +12,16 @@ using namespace sf;
 
 int main (int argc, char *argv[]) {
 	VideoMode const desktopMode = VideoMode::getDesktopMode();
+	RenderWindow w(desktopMode, "Osmos");
 
 	Parsys p = UnirandParsysGen(
 		300, 0, max(desktopMode.width, desktopMode.height), 4
 	).generate();
     weak_ptr<Particle> controlled = *p.cbegin();
 
-	RenderWindow w(desktopMode, "Osmos");
 	WindowManager wManager{w};
 	CParticleManager cManager{controlled};
+	ViewManager vManager{w, p, controlled};
 	Event e;
 
 	ParsysView const v{p, controlled};
@@ -35,6 +36,7 @@ int main (int argc, char *argv[]) {
 		while (w.pollEvent(e)) {
 			wManager.manage(e);
 			cManager.manage(e);
+			vManager.manage(e);
 		}
 
 		w.clear();

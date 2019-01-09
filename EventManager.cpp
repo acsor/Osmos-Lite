@@ -47,3 +47,33 @@ void WindowManager::manage(Event &e) {
     		break;
     }
 }
+
+
+ViewManager::ViewManager(
+	RenderWindow &window, Parsys &system, weak_ptr<Particle> controlled
+): mW{window}, mControlled{controlled}, mS{system} {
+	mS.attach(this);
+	centerMainView();
+}
+
+void ViewManager::manage(Event &e) {
+}
+
+void ViewManager::onChange(Observable const *o) {
+	if (o == &mS) {
+		centerMainView();
+	}
+}
+
+void ViewManager::centerMainView() const {
+	View v;
+	shared_ptr<Particle> s;
+
+	if (!mControlled.expired()) {
+		s = mControlled.lock();
+
+		v.setCenter(s->x(), s->y());
+		v.setSize(mW.getSize().x, mW.getSize().y);
+		mW.setView(v);
+	}
+}

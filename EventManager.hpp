@@ -31,5 +31,19 @@ class WindowManager: public EventManager {
 		void manage(Event &e) override;
 };
 
+class ViewManager: public EventManager, public Observer {
+	private:
+		RenderWindow &mW;
+		Parsys &mS;
+		weak_ptr<Particle> mControlled;
+	public:
+		ViewManager(
+			RenderWindow &window, Parsys &system, weak_ptr<Particle> controlled
+		);
+		void manage(Event &e) override;
+		void onChange(Observable const *o) override;
+		void centerMainView() const;
+};
+
 
 #endif
