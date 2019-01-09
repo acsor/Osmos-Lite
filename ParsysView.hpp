@@ -1,6 +1,7 @@
 #ifndef PARTICLE_GRID_H
 #define PARTICLE_GRID_H
 
+#include <memory>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
@@ -12,7 +13,7 @@ using namespace std;
 class ParsysView: public Drawable, public Observer {
 	private:
 		Parsys *mSys{nullptr};
-		Particle &mControlled;
+		weak_ptr<Particle> mControlled;
 		unordered_map<Particle, CircleShape> *mPviews{nullptr};
 	
 	public:
@@ -20,7 +21,7 @@ class ParsysView: public Drawable, public Observer {
 		static const Color COLOR_GT;
 		static const Color COLOR_LT;
 
-		ParsysView(Parsys &s, Particle &controlled);
+		ParsysView(Parsys &s, weak_ptr<Particle> const &controlled);
 		~ParsysView();
 
 		void draw(RenderTarget& target, RenderStates states) const override;
