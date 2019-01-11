@@ -49,31 +49,20 @@ void WindowManager::manage(Event &e) {
 }
 
 
-ViewManager::ViewManager(
-	RenderWindow &window, Parsys &system, weak_ptr<Particle> controlled
-): mW{window}, mControlled{controlled}, mS{system} {
-	mS.attach(this);
-	centerMainView();
+ViewManager::ViewManager(RenderWindow &window, ParsysView &sysview):
+	mW{window}, mSysview{sysview} {
 }
 
 void ViewManager::manage(Event &e) {
-}
-
-void ViewManager::onChange(Observable const *o) {
-	if (o == &mS) {
-		centerMainView();
-	}
-}
-
-void ViewManager::centerMainView() const {
-	View v;
-	shared_ptr<Particle> s;
-
-	if (!mControlled.expired()) {
-		s = mControlled.lock();
-
-		v.setCenter(s->x(), s->y());
-		v.setSize(mW.getSize().x, mW.getSize().y);
-		mW.setView(v);
+	if (e.type == Event::KeyPressed) {
+		if (e.key.code == Keyboard::Add && mSysview.zoom() < mMaxZoom) {
+			mSysview.zoomIn();
+		} else if (
+				e.key.code == Keyboard::Subtract && mMinZoom < mSysview.zoom()
+		) {
+			mSysview.zoomOut();
+		} else if (e.key.code == Keyboard::Equal) {
+			mSysview.zoomReset();
+		}
 	}
 }

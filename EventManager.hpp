@@ -4,6 +4,7 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
+#include "ParsysView.hpp"
 
 using namespace std;
 using namespace sf;
@@ -33,18 +34,15 @@ class WindowManager: public EventManager {
 		void manage(Event &e) override;
 };
 
-class ViewManager: public EventManager, public Observer {
+class ViewManager: public EventManager {
 	private:
 		RenderWindow &mW;
-		Parsys &mS;
-		weak_ptr<Particle> mControlled;
+		ParsysView &mSysview;
 	public:
-		ViewManager(
-			RenderWindow &window, Parsys &system, weak_ptr<Particle> controlled
-		);
+		short int mMaxZoom{8}, mMinZoom{-5};
+
+		ViewManager(RenderWindow &window, ParsysView &sysview);
 		void manage(Event &e) override;
-		void onChange(Observable const *o) override;
-		void centerMainView() const;
 };
 
 
