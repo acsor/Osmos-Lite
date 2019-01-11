@@ -5,33 +5,62 @@ EventManager::~EventManager () {
 }
 
 
-CParticleManager::CParticleManager(weak_ptr<Particle> controlled) {
+CParticleManager::CParticleManager(
+	Vector2f bounds, weak_ptr<Particle> controlled
+) {
+	mBounds = bounds;
 	mControlled = controlled;
 }
 
 void CParticleManager::manage(Event &e) {
 	if (e.type == Event::KeyPressed && !mControlled.expired()) {
+		mCopy = *mControlled.lock();
+
 		switch (e.key.code) {
 			case Keyboard::Numpad2:
 			case Keyboard::S:
-				mControlled.lock()->move(0, STEP_SIZE);
+				mCopy.move(0, STEP_SIZE);
+
+				if (withinBounds(mCopy))
+					mControlled.lock()->move(0, STEP_SIZE);
+
 				break;
 			case Keyboard::Numpad4:
 			case Keyboard::A:
-				mControlled.lock()->move(-STEP_SIZE, 0);
+				mCopy.move(-STEP_SIZE, 0);
+
+				if (withinBounds(mCopy))
+					mControlled.lock()->move(-STEP_SIZE, 0);
+
 				break;
 			case Keyboard::Numpad6:
 			case Keyboard::D:
-				mControlled.lock()->move(STEP_SIZE, 0);
+				mCopy.move(STEP_SIZE, 0);
+
+				if (withinBounds(mCopy))
+					mControlled.lock()->move(STEP_SIZE, 0);
+
 				break;
 			case Keyboard::Numpad8:
 			case Keyboard::W:
-				mControlled.lock()->move(0, -STEP_SIZE);
+				mCopy.move(0, -STEP_SIZE);
+
+				if (withinBounds(mCopy))
+					mControlled.lock()->move(0, -STEP_SIZE);
+
 				break;
 			default:
 				break;
 		}
 	}
+}
+
+bool CParticleManager::withinBounds(Particle p) const {
+	return
+		mBounds.x < (p.x() - p.radius()) &&
+		(p.x() + p.radius()) < mBounds.y &&
+		mBounds.x < (p.y() - p.radius()) &&
+		(p.y() + p.radius()) < mBounds.y;
 }
 
 

@@ -16,13 +16,19 @@ class EventManager {
         void virtual manage(Event &e) = 0;
 };
 
+
 class CParticleManager: public EventManager {
 	private:
+		Vector2f mBounds;
 		weak_ptr<Particle> mControlled;
+		// Class variable only for performance's sake
+		Particle mCopy{0, 0, 1};
+
+		bool withinBounds(Particle p) const;
 
 		static constexpr float STEP_SIZE = 10;
 	public:
-		CParticleManager(weak_ptr<Particle> controlled);
+		CParticleManager(Vector2f bounds, weak_ptr<Particle> controlled);
 		void manage(Event &e) override;
 };
 
