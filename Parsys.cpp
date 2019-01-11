@@ -20,7 +20,9 @@ Particle::Particle(float x, float y, float radius) {
 }
 
 bool Particle::clashes (Particle const &o) const {
-	return sqrt(pow(mX - o.mX, 2) + pow(mY - o.mY, 2)) <= mRadius + o.mRadius;
+	return sqrtf(
+		powf(mX - o.mX, 2) + powf(mY - o.mY, 2)
+	) <= mRadius + o.mRadius;
 }
 
 bool Particle::nearby (Particle const &o, float whence) const {
