@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <cmath>
+#include <valarray>
 #include <SFML/Graphics.hpp>
 #include "Parsys.hpp"
 #include "ParsysView.hpp"
@@ -12,22 +13,27 @@ using namespace sf;
 
 int main (int argc, char *argv[]) {
 	VideoMode const desktopMode = VideoMode::getDesktopMode();
-	RenderWindow w(desktopMode, "Osmos");
+	RenderWindow w{desktopMode, "Osmos"};
+	valarray<float> gameBounds{0, 1000};
 
 	Parsys p = UnirandParsysGen(
-		300, 0, max(desktopMode.width, desktopMode.height), 4
+		200, gameBounds[0], gameBounds[1], 4
 	).generate();
     weak_ptr<Particle> controlled = *p.cbegin();
 
+	ParsysView v{p, controlled};
+	v.position(0, 0);
+	v.size(
+		abs(gameBounds[0] - gameBounds[1]), abs(gameBounds[0] - gameBounds[1])
+	);
+
 	WindowManager wManager{w};
-	CParticleManager cManager{controlled};
-	ViewManager vManager{w, p, controlled};
+	CParticleManager cManager{
+		Vector2f{gameBounds[0], gameBounds[1]}, controlled
+	};
+	ViewManager vManager{w, v};
 	Event e;
 
-	ParsysView const v{p, controlled};
-
-	// TO-DO Find out why there's the need to notify an additional time.
-	p.notify();
 	w.setFramerateLimit(60);
 
 	cout << "Starting up with " << p.size() << " particles." << endl;
@@ -39,12 +45,12 @@ int main (int argc, char *argv[]) {
 			vManager.manage(e);
 		}
 
-		w.clear();
+		w.clear(Color(0, 15, 59));
 		w.draw(v);
 		w.display();
 	}
 
-	cout << "Closed with " << p.size() << " particles." << endl;
+	cout << "Closing with " << p.size() << " particles." << endl;
 
 	return EXIT_SUCCESS;
 }
