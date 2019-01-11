@@ -1,13 +1,17 @@
-#include <typeinfo>
+#include <cmath>
+#include <valarray>
 #include "ParsysView.hpp"
 #include "Observer.hpp"
 
 
 /**
- * @return Color for a given particle with reference to the commanded one (i.e.
- * `moving').
+ * @brief Stylizes a given particle according to its role in the game (whether
+ * smaller and hence to be absorbed, bigger and thus a menace, or the moving
+ * particle).
  */
-static Color particleColor(Particle const &p, weak_ptr<Particle> &moving);
+static void particleDecoration(
+	CircleShape &target, Particle const &p, weak_ptr<Particle> &moving
+);
 
 
 static const Color COLOR_MOVING = Color::Cyan;
@@ -19,7 +23,19 @@ ParsysView::ParsysView(Parsys &s, weak_ptr<Particle> const &controlled) {
 	mSys->attach(this);
 	mSys->notify();
 	mControlled = controlled;
+}
 
+const Color ParsysView::COLOR_BACKGROUND = Color(0, 22, 107);
+const Color ParsysView::COLOR_OUT_BACKGROUND = Color(0, 24, 92);
+const Color ParsysView::COLOR_BACKGROUND_MAP = Color(0, 15, 71);
+const Color ParsysView::COLOR_OUT_BACKGROUND_MAP = Color(0, 62, 86);
+
+const Color ParsysView::COLOR_MOVING = Color::Cyan;
+const Color ParsysView::COLOR_OUT_MOVING = Color(0, 179, 181);
+const Color ParsysView::COLOR_GT = Color(202, 0, 44);
+const Color ParsysView::COLOR_OUT_GT = Color(145, 0, 20);
+const Color ParsysView::COLOR_LT = Color(0, 40, 151);
+const Color ParsysView::COLOR_OUT_LT = Color(0, 4, 98);
 	mPviews = new unordered_map<Particle, CircleShape>();
 }
 
@@ -59,16 +75,25 @@ void ParsysView::onChange(Observable const *o) {
 
 }
 
+static void particleDecoration(
+	CircleShape &target, Particle const &p, weak_ptr<Particle> &moving
+) {
+	target.setOutlineThickness(-1.5);
 
-static Color particleColor(Particle const &p, weak_ptr<Particle> &moving) {
 	// If the controlled particle isn't found within the system, it means it
 	// was absorbed into another, and hence the game is lost -- with all the
 	// other particles gaining greater radius than it would have.
 	if (moving.expired()) {
-        return COLOR_GT;
+		target.setFillColor(ParsysView::COLOR_GT);
+		target.setOutlineColor(ParsysView::COLOR_OUT_GT);
     } else if (p == *moving.lock()) {
-        return COLOR_MOVING;
+		target.setFillColor(ParsysView::COLOR_MOVING);
+		target.setOutlineColor(ParsysView::COLOR_OUT_MOVING);
+	} else if (p.radius() < moving.lock()->radius()) {
+		target.setFillColor(ParsysView::COLOR_LT);
+		target.setOutlineColor(ParsysView::COLOR_OUT_LT);
 	} else {
-		return (p.radius() <= moving.lock()->radius()) ? COLOR_LT: COLOR_GT;
+		target.setFillColor(ParsysView::COLOR_GT);
+		target.setOutlineColor(ParsysView::COLOR_OUT_GT);
 	}
 }

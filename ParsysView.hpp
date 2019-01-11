@@ -17,9 +17,17 @@ class ParsysView: public Drawable, public Observer {
 		unordered_map<Particle, CircleShape> *mPviews{nullptr};
 	
 	public:
+		static const Color COLOR_BACKGROUND;
+		static const Color COLOR_OUT_BACKGROUND;
+		static const Color COLOR_BACKGROUND_MAP;
+		static const Color COLOR_OUT_BACKGROUND_MAP;
+
 		static const Color COLOR_MOVING;
+		static const Color COLOR_OUT_MOVING;
 		static const Color COLOR_GT;
+		static const Color COLOR_OUT_GT;
 		static const Color COLOR_LT;
+		static const Color COLOR_OUT_LT;
 
 		ParsysView(Parsys &s, weak_ptr<Particle> const &controlled);
 		~ParsysView();
